@@ -1,0 +1,23 @@
+[
+	{ "name":"GetUser",
+	  "method": "GET",
+  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
+  	  "timeoutSeconds": 10,
+  	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
+  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
+  	  },
+  	  { "name":"CreateUser",
+	  "method": "POST",
+  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
+  	  "timeoutSeconds": 10,
+  	    	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
+  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
+  	  },
+  	  { "name":"EditUser",
+	  "method": "PUT",
+  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
+  	  "timeoutSeconds": 10,
+  	    	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
+  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
+  	  }
+]

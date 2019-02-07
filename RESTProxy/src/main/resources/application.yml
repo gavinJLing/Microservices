@@ -1,0 +1,12 @@
+erver:
+  port: 8090
+  servlet:
+    application-display-name: REST-Proxy
+    
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: ProxyConfig
+ 
