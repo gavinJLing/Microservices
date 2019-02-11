@@ -53,7 +53,26 @@ open ./build/reports/jacoco/test/html/index.html
 ## POST a RESTProxy Request
 With the MongoDb and RESTProxy server launched as described above, perform a HTTP POST with a body JSON to the RESTProxy service endpoint to trigger a 3rd Party service and obtain a response. Various tools can be used for this 'PostMan' plugin for the Chrome browser is propular, however other tools exist such as 'curl' and 'wget'.  See below for an example of 'curl' POST'ing a logical request as a JSON body to the RESTProxy endpoint.
 ```
-curl -d '{"name": "GetUser", "qparam":[{"key":"userid", "value":"1"}]}' -H "Content-Type: application/json" -X POST http://localhost:8080/serviceproxy
+curl -v -d  '{"name": "GetUser", "qparam":[{"key":"userid", "value":"1"}]}' -H "Content-Type: application/json" -X POST http://localhost:8080/remoteservicegateway/proxyService
+```
+where the expected response should appear as:
+```
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> POST /remoteservicegateway/proxyService HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.54.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 61
+> 
+* upload completely sent off: 61 out of 61 bytes
+< HTTP/1.1 200 
+< Content-Length: 0
+< Date: Mon, 11 Feb 2019 12:30:51 GMT
+< 
+* Connection #0 to host localhost left intact
 ```
 
 ### Configuration overrides
