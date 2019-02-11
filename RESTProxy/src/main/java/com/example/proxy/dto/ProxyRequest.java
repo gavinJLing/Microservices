@@ -33,9 +33,17 @@ public class ProxyRequest {
         this.name = name;
     }
     
-    
+    /**
+     * Is the Proxy request valid.
+     * The proxy request logical service 'name' is seen as mandatory. 
+     * 
+     * other aspect of the request may also be checker for validity e.g. query parma Name / value pairs
+     * 
+     * @return boolean
+     */
     public boolean isValid() {
-        return StringUtils.isBlank(name);
+        // simply enforce that service name is mandatory.
+        return StringUtils.isNotBlank(name);
     }
 
 
@@ -50,5 +58,14 @@ public class ProxyRequest {
     public void addHeader(String headerName, String value) {
         // TODO Auto-generated method stub
         
+    }
+
+
+    /**
+     * Make the code easier to read.  Simply invert the isValid method. 
+     * @return boolean
+     */
+    public boolean isNotValid() {
+        return ! isValid();
     }
 }
