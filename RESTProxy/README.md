@@ -1,9 +1,24 @@
 # RESTProxy:
 
-A simple microservice to act as a proxy between internal microservices and external 3rd party API services. Where an internal service will create a logical service request object and POST this to the RESTProxy. A MongoDb 'services' collection is used to resolve the logical to physical service mapping, where additional static service details are recorded e.g. external 3rd party URL etc. The proxy will then invoke the external 3rd party service. The response being passed back to the internal client of this proxy, where they should mange the response. The assumption here is that this is a highly REST centric landscape. However the system could be extended to handle different message payload types (XML/SOAP or text) and transport implementations e.g. async RabbitMQ or Kafka service invocation passing back a correlation id upon the msg being published to the queue/topic.
+A simple microservice to act as a proxy between internal microservices and external 3rd party API services. 
+Where an internal service will POST a 'Proxy Request' object to the RESTProxy. 
+A MongoDb 'services' collection is used to resolve the logical to physical service mapping, where additional static service details are recorded e.g. external 3rd party URL etc. 
+The proxy will then invoke the external 3rd party service. 
+The response being passed back to the internal client as a 'Proxy Response' object.
+Where they should manage the response. A key features of the RESTProxy is that to add additional 
+3rd party API's - only the MongoDb ProxyConfig.services collection needs to be updated.
+
 
 ## Assumptions:
-This project uses a number of tools, understanding them at a high level should be sufficient to execute this service, following the developer instructions below. Being aware of Git, Docker, MongoDb/ MongoCompass, a REST test client (e.g. Postman) and Gradle build tool, would be an advantage.
+A few assumption about this service:
+
+1. This project uses a number of tools, understanding them at a high level should be sufficient to execute this service, following the developer instructions below. 
+   Being aware of Git, Docker, MongoDb/ MongoCompass and Gradle build tool, would be an advantage.
+2. The RESTProxy service does not currently support URL path parameter value requests 
+   (only query params)
+3. All services are REST/JSON based.
+4. In testing this service, it was helpful to have 3rd party api that supported CRUD 
+   operations to test the various HTTP operations.
 
 ## Get the example
 ```

@@ -45,7 +45,9 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-rest')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 	
-
+	// httpclient -  used to override the default HTTPClient so that I can set the client side time out
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
+    
     //some common useful things
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
