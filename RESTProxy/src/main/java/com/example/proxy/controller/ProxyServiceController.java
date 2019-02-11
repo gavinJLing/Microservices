@@ -1,7 +1,10 @@
 package com.example.proxy.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.proxy.dto.ProxyRequest;
+import com.example.proxy.model.ServiceDefinition;
+import com.example.proxy.repository.ServiceRepository;
 
 @RestController
 @RequestMapping("/remoteservicegateway") 
@@ -18,6 +23,9 @@ import com.example.proxy.dto.ProxyRequest;
 public class ProxyServiceController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
+    ServiceRepository serviceRepo;
+    
     /**
      * POST /remoteservicegateway/proxyService
      *  Realy proxy Request onto external 3rd party service and respond
@@ -40,8 +48,21 @@ public class ProxyServiceController {
         try{
             
             // validate the proxy request
+            if (proxyRequest.isNotValid() ) {
+                throw new IllegalArgumentException("Malformed Proxy Service Request. Not Valid.");
+            } 
             
             // retrieve service mapping from persistent store
+            List<ServiceDefinition> serviceDefs = serviceRepo.findByName(proxyRequest.getName());
+            // check for a match. If not found then client is asking for an unknown service. (http 400 - bad service)
+            if (serviceDefs.isEmpty()) {
+                throw new IllegalArgumentException("Invalid Proxy Service Request. Logical service name not recognised.");
+            }
+            // check for service duplicates and report back as an internal server issue. (http 500 Internal server error)
+            if (serviceDefs.size() > 1) {
+                throw new IllegalStateException(String.format("Duplicate services located. %s '%s' services located.",serviceDefs.size(), proxyRequest.getName() ));
+            }
+            
             
             // Engineer 3rd Party URL and invoke
             
@@ -51,7 +72,11 @@ public class ProxyServiceController {
             
         } catch (IllegalArgumentException iae){
             httpStatus = HttpStatus.BAD_REQUEST;   // http 400
-            msg = String.format("HTTPStatus:%s Unable to service proxy request.  %s",httpStatus, iae.getMessage() );
+            msg = String.format("HTTPStatus:%s Unable to service proxy request '%s'.  %s",httpStatus, proxyRequest.getName(), iae.getMessage() );
+            
+        } catch (IllegalStateException ise) {
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;   // http 500
+            msg = String.format("HTTPStatus:%s Unable to service proxy request '%s'.  %s",httpStatus, proxyRequest.getName(), ise.getMessage() );
             
            
         } catch( Throwable t){
