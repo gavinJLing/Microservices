@@ -24,6 +24,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.proxy.dto.ProxyRequest;
+import com.example.proxy.dto.ProxyResponse;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -59,15 +60,16 @@ public class ProxyTests {
 
         logger.info("testProxyPost400: Client sent malformed message - madatory logical service name not present.");
 
+        ResponseEntity<?> proxyResponseEntity = null;
         ProxyRequest proxyRequest = new ProxyRequest();
         proxyRequest.setName(null); // <- creates a malformed oproxyRequest object.
 
-        ResponseEntity<?> proxyResponseEntity = null;
+        
 
         try {
             RestTemplate restTemplate = new RestTemplate();
             proxyResponseEntity = restTemplate.exchange(proxyServiceURL, HttpMethod.POST,
-                    new HttpEntity<>(proxyRequest, createRESTHeaders()), ProxyRequest.class);
+                    new HttpEntity<>(proxyRequest, createRESTHeaders()), ProxyResponse.class);
 
             // should not get here.
             fail("testProxyPost400: Failed to detetect missing 'name' in proxy request");
@@ -116,7 +118,7 @@ public class ProxyTests {
             // invoke the proxy service with unsupported endpoint url.
             RestTemplate restTemplate = new RestTemplate();
             proxyResponseEntity = restTemplate.exchange(invalidProxyServiceURL, HttpMethod.POST,
-                    new HttpEntity<>(new ProxyRequest(), createRESTHeaders()), ProxyRequest.class);
+                    new HttpEntity<>(new ProxyRequest(), createRESTHeaders()), ProxyResponse.class);
 
             // should not get here.
             fail("testProxyPost404: Failed test. Unexpected behaviour, ");
@@ -131,36 +133,39 @@ public class ProxyTests {
     }
 
     /**
-     * 3rd Party URL invoked via Proxy Service.
+     * Proxy Service experienced problems invoking remote service.
+     * 
+     * Attempt to invoke a service that does not exist on the Internet.
+     * 
+     * This will generate a Http404 from the Proxy Service POV.
+     * However this is wrapped as a Http502  to the internal client.
      * 
      * 
      * 
-     * Expected response HTTP 200 (HTTP OK)
+     * Expected response HTTP 502 (HTTP Bad gateway)
      */
     @Test
-    public void testProxyPost200() {
+    public void testProxyPost502() {
 
-        logger.info("testProxyPost200: 3rd Party URL invoked via  Proxy Service.");
+        logger.info("testProxyPost502: Invoke 404 3rd Party URL, presented back to internal client as 502");
 
         ResponseEntity<?> proxyResponseEntity = null;
 
         // Create a typical client request
         ProxyRequest proxyRequest = new ProxyRequest();
-        proxyRequest.setName("GetUser");
-        proxyRequest.addQueryParam("summary", "true");
-//      proxyRequest.addPathParam("userId","1");        // Assumed that URL path param are out of scope of this example e.g. getUser/1?summary=true
-        proxyRequest.addHeader("abc", "123");
-
+        proxyRequest.setName("NonExistentApi");
+        
         try {
 
             // invoke the proxy service with unsupported endpoint url.
             RestTemplate restTemplate = new RestTemplate();
             proxyResponseEntity = restTemplate.exchange(proxyServiceURL, HttpMethod.POST,
-                    new HttpEntity<>(proxyRequest, createRESTHeaders()), ProxyRequest.class);
+                    new HttpEntity<>(proxyRequest, createRESTHeaders()), ProxyResponse.class);
 
             // Expected 3rd Party response code, seen from Proxy Service invocation.
             assertThat(proxyResponseEntity.getStatusCodeValue(), is(equalTo(200)));
 
+            
         } catch (Exception e) {
 
             // should not get here.
@@ -194,7 +199,7 @@ public class ProxyTests {
             // invoke the proxy service with unsupported endpoint url.
             RestTemplate restTemplate = new RestTemplate();
             proxyResponseEntity = restTemplate.exchange(proxyServiceURL, HttpMethod.POST,
-                    new HttpEntity<>(proxyRequest, createRESTHeaders()), ProxyRequest.class);
+                    new HttpEntity<>(proxyRequest, createRESTHeaders()), ProxyResponse.class);
 
             // should not get here.
             fail("testUnknownLogicalService: Failed test. Unexpected behaviour, ");
@@ -243,6 +248,46 @@ public class ProxyTests {
         }
     
     }
+
+    /**
+         * 3rd Party URL invoked via Proxy Service.
+         * 
+         * 
+         * 
+         * Expected response HTTP 200 (HTTP OK)
+         */
+        @Test
+        public void testProxyPost200() {
+    
+            logger.info("testProxyPost200: 3rd Party URL invoked via  Proxy Service.");
+    
+            ResponseEntity<?> proxyResponseEntity = null;
+    
+            // Create a typical client request
+            ProxyRequest proxyRequest = new ProxyRequest();
+            proxyRequest.setName("GetUser");
+            proxyRequest.addQueryParam("summary", "true");
+            proxyRequest.addHeader("abc", "123");
+    
+            try {
+    
+                // invoke the proxy service with unsupported endpoint url.
+                RestTemplate restTemplate = new RestTemplate();
+                proxyResponseEntity = restTemplate.exchange(proxyServiceURL, HttpMethod.POST,
+                        new HttpEntity<>(proxyRequest, createRESTHeaders()), ProxyResponse.class);
+    
+                // Expected 3rd Party response code, seen from Proxy Service invocation.
+                assertThat(proxyResponseEntity.getStatusCodeValue(), is(equalTo(200)));
+    
+                
+            } catch (Exception e) {
+    
+                // should not get here.
+                fail("testProxyPost200: Failed test. Unexpected behaviour, ");
+    
+            }
+    
+        }
 
     
 
