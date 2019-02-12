@@ -3,11 +3,11 @@
 		"name": "GetUser",
 		"description": "A test service I declared to satisfy a +ve Http200 test outcome",
 		"method": "GET",
-		"url": "http://localhost:8081/StarQuake/security/api/v1/zone/",
+		"url": "http://localhost:8081/lingzone.co.uk./api/v1/abc/",
 		"timeoutSeconds": 10,
 		"staticHeaders": [
 			{
-				"Authorization": "Token Token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnYXZpbiJ9.QymCSv_p-MFgROGkSxAnHts7BTxEtzcgCur3hIffCqg"
+				"Authorization": "Token Token eyJhbGciOiJIdUzI1NiJ9.eyJzdWvIiOiJnYXZpbiJ9.QymCSv_p-MFgROGkSxAnhHts7BTxEtzcgCur3hIffCqg"
 			}
 		]
 	},
@@ -15,7 +15,7 @@
 		"name": "GetUserTimeOut",
 		"description": "A test service I declared to satisfy a Http502 test outcome, based on remote client (sleeps 45sec)",
 		"method": "GET",
-		"url": "http://localhost:8081/StarQuake/security/api/v1/policies/",
+		"url": "http://localhost:8081/lingzone.co.uk/api/v1/xyz/",
 		"timeoutSeconds": 10
 	},
 	{
