@@ -1,37 +1,46 @@
 [
-	{ "name":"GetUser",
-	  "method": "GET",
-  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
-  	  "timeoutSeconds": 10,
-  	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
-  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
-  	  },
-  	  { "name":"CreateUser",
-	  "method": "POST",
-  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
-  	  "timeoutSeconds": 10,
-  	    	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
-  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
-  	  },
-  	  { "name":"EditUser",
-	  "method": "PUT",
-  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
-  	  "timeoutSeconds": 10,
-  	    	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
-  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
-  	  },
-  	  { "name":"EditUser",
-	  "method": "PUT",
-  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
-  	  "timeoutSeconds": 10,
-  	    	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
-  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
-  	  },
-  	  { "name":"EditUser",
-	  "method": "PUT",
-  	  "url" : { "protocol": "http", "host":"example.com", "path":"/users"},
-  	  "timeoutSeconds": 10,
-  	    	  "staticHeaders" : [ {"Auth":"Token abcdefg"}],
-  	  "staticQueryParams" : [{"sort":"desc"},{"pageSize":10}]
-  	  }
+	{
+		"name": "GetUser",
+		"description": "A test service I declared to satisfy a +ve Http200 test outcome",
+		"method": "GET",
+		"url": "http://localhost:8081/StarQuake/security/api/v1/zone/",
+		"timeoutSeconds": 10,
+		"staticHeaders": [
+			{
+				"Authorization": "Token Token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnYXZpbiJ9.QymCSv_p-MFgROGkSxAnHts7BTxEtzcgCur3hIffCqg"
+			}
+		]
+	},
+	{
+		"name": "GetUserTimeOut",
+		"description": "A test service I declared to satisfy a Http502 test outcome, based on remote client (sleeps 45sec)",
+		"method": "GET",
+		"url": "http://localhost:8081/StarQuake/security/api/v1/policies/",
+		"timeoutSeconds": 10
+	},
+	{
+		"name": "EditUserDuplicate",
+		"description": "A Test service which fails Rest Proxy validation HTTP400, due to dulicate enties in this config.",
+		"method": "PUT",
+		"url": "http://example.com/users",
+		"timeoutSeconds": 10,
+		"staticHeaders": [
+			{
+				"Auth": "Token abcdefg"
+			}
+		]
+	},
+	{
+		"name": "EditUserDuplicate",
+		"description": "A Test service which fails Rest Proxy validation Http 400, due to dulicate enties in this config.",
+		"method": "PUT",
+		"url": "http://example.com/users",
+		"timeoutSeconds": 10
+	},
+	{
+		"name": "FakeApi",
+		"description": "A test service I declared to satisfy a +ve Http404 test outcome",
+		"method": "Get",
+		"url": "http://doesnotexist.com/fake"
+	}
 ]

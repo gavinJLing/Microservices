@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.proxy.dto.ProxyRequest;
+import com.example.proxy.dto.ProxyResponse;
 import com.example.proxy.model.ServiceDefinition;
 import com.example.proxy.repository.ServiceRepository;
+import com.example.proxy.service.ProxyServiceClient;
+import com.example.proxy.service.RemoteInvocationException;
 
 @RestController
 @RequestMapping("/remoteservicegateway") 
@@ -25,6 +28,9 @@ public class ProxyServiceController {
 
     @Autowired
     ServiceRepository serviceRepo;
+    
+    @Autowired 
+    ProxyServiceClient proxyServiceClient;
     
     /**
      * POST /remoteservicegateway/proxyService
@@ -42,8 +48,8 @@ public class ProxyServiceController {
     @RequestMapping(value = "/proxyService", method = RequestMethod.POST, headers="Accept=application/json")
     public ResponseEntity<?> service(@RequestBody ProxyRequest proxyRequest) {
         HttpStatus httpStatus = HttpStatus.OK;
-        ResponseEntity response = null;
-        String msg = "ok";
+        ProxyResponse proxyResponse = null;
+        String msg = "Processed ok";
         
         try{
             
@@ -64,32 +70,42 @@ public class ProxyServiceController {
             }
             
             
+           
             // Engineer 3rd Party URL and invoke
+            // Any exceptions encountered during the upstream rest call - will be wrapped as a
+            // RemoteInvocationException and get a return code on Http 502 (bad gateway)
+            proxyResponse = proxyServiceClient.invokeRemote(proxyRequest, serviceDefs.get(0));
+          
             
-            // manage the 3rd party response  ( 200, 40x & 50x) back ot client.
-        
+               
             
             
         } catch (IllegalArgumentException iae){
             httpStatus = HttpStatus.BAD_REQUEST;   // http 400
-            msg = String.format("HTTPStatus:%s Unable to service proxy request '%s'.  %s",httpStatus, proxyRequest.getName(), iae.getMessage() );
+            msg = String.format("Unable to service proxy request. %s", iae.getMessage() );
             
         } catch (IllegalStateException ise) {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;   // http 500
-            msg = String.format("HTTPStatus:%s Unable to service proxy request '%s'.  %s",httpStatus, proxyRequest.getName(), ise.getMessage() );
+            msg = String.format("Unable to service proxy request. %s", ise.getMessage() );
             
-           
+        } catch ( RemoteInvocationException rie) {
+            httpStatus = HttpStatus.BAD_GATEWAY;   // http 502
+            msg = String.format("Unable to service proxy request. %s", rie.getMessage() );
+            
         } catch( Throwable t){
             httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
-            msg = String.format("HTTPStatus:%s A serious error occured, attempting to service request. Logical Request: '%s'. Error: %s",httpStatus.toString(), proxyRequest.getName(), t.getMessage() );
+            msg = String.format("A serious error occured, attempting to service request. %s", t.getMessage() );
             
              
             
         }finally {
-            logger.info( String.format("HTTPStatus:%s Serviced Proxy Request for logical service: '%s'", httpStatus.toString() , proxyRequest.getName() ) );
+            logger.info( String.format("HTTPStatus:%s, Request:%s, Msg:%s", httpStatus , proxyRequest.getName() , msg ) );
         }
         
-        // return the saved - new Policy - it has been enriched with stores new primary key
-        return new ResponseEntity<>(response, httpStatus);
+         
+   
+       return new ResponseEntity<>(proxyResponse, httpStatus);
+       
+       
     }
 }
